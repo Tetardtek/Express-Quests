@@ -9,8 +9,13 @@ const userControllers = require("./controllers/userControllers");
 
 app.get("/api/movies", movieControllers.getMovies);
 app.get("/api/movies/:id", movieControllers.getMovieById);
+app.post("/api/movies", movieControllers.postMovies);
+app.put("/api/movies/:id", movieControllers.updateMovies);
+
+
 app.get("/api/users", userControllers.getUsers);
 app.get("/api/users/:id", userControllers.getUsersById);
-app.post("/api/movies", movieControllers.postMovies);
 app.post("/api/users", userControllers.postUsers);
+app.put("/api/users/:id", userControllers.updateUsers);
+
 module.exports = app;
