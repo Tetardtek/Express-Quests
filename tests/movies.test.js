@@ -1,14 +1,18 @@
 const request = require("supertest");
+
 const app = require("../src/app");
+
 const database = require("../database");
 
 afterAll(() => database.end());
+
 
 describe("GET /api/movies", () => {
   it("should return all movies", async () => {
     const response = await request(app).get("/api/movies");
 
     expect(response.headers["content-type"]).toMatch(/json/);
+
     expect(response.status).toEqual(200);
   });
 });
@@ -18,6 +22,7 @@ describe("GET /api/movies/:id", () => {
     const response = await request(app).get("/api/movies/1");
 
     expect(response.headers["content-type"]).toMatch(/json/);
+
     expect(response.status).toEqual(200);
   });
 
@@ -28,18 +33,19 @@ describe("GET /api/movies/:id", () => {
   });
 });
 
-
 describe("POST /api/movies", () => {
   it("should return created movie", async () => {
     const newMovie = {
       title: "Star Wars",
       director: "George Lucas",
       year: "1977",
-      color: "1",
+      color: true,
       duration: 120,
     };
+
     const response = await request(app).post("/api/movies").send(newMovie);
 
+    expect(response.headers["content-type"]).toMatch(/json/);
     expect(response.status).toEqual(201);
     expect(response.body).toHaveProperty("id");
     expect(typeof response.body.id).toBe("number");
@@ -52,16 +58,13 @@ describe("POST /api/movies", () => {
     const [movieInDatabase] = result;
 
     expect(movieInDatabase).toHaveProperty("id");
+
     expect(movieInDatabase).toHaveProperty("title");
-    expect(movieInDatabase).toHaveProperty("director");
-    expect(movieInDatabase).toHaveProperty("year");
-    expect(movieInDatabase).toHaveProperty("color");
-    expect(movieInDatabase).toHaveProperty("duration");
     expect(movieInDatabase.title).toStrictEqual(newMovie.title);
     expect(movieInDatabase.director).toStrictEqual(newMovie.director);
     expect(movieInDatabase.year).toStrictEqual(newMovie.year);
-    expect(movieInDatabase.color).toStrictEqual(newMovie.color);
-    expect(movieInDatabase.duration).toStrictEqual(newMovie.duration);
+    expect(Boolean(movieInDatabase.color)).toStrictEqual(newMovie.color);
+    expect(movieInDatabase.duration).toBe(newMovie.duration);
   });
 
   it("should return an error", async () => {
@@ -71,7 +74,7 @@ describe("POST /api/movies", () => {
       .post("/api/movies")
       .send(movieWithMissingProps);
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(422);
   });
 });
 
@@ -81,13 +84,19 @@ describe("PUT /api/movies/:id", () => {
       title: "Avatar",
       director: "James Cameron",
       year: "2010",
-      color: "1",
+      color: true,
       duration: 162,
     };
 
     const [result] = await database.query(
       "INSERT INTO movies(title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
-      [newMovie.title, newMovie.director, newMovie.year, newMovie.color, newMovie.duration]
+      [
+        newMovie.title,
+        newMovie.director,
+        newMovie.year,
+        newMovie.color,
+        newMovie.duration,
+      ]
     );
 
     const id = result.insertId;
@@ -96,7 +105,7 @@ describe("PUT /api/movies/:id", () => {
       title: "Wild is life",
       director: "Alan Smithee",
       year: "2023",
-      color: "0",
+      color: false,
       duration: 120,
     };
 
@@ -106,7 +115,10 @@ describe("PUT /api/movies/:id", () => {
 
     expect(response.status).toEqual(204);
 
-    const [movies] = await database.query("SELECT * FROM movies WHERE id=?", id);
+    const [movies] = await database.query(
+      "SELECT * FROM movies WHERE id=?",
+      id
+    );
 
     const [movieInDatabase] = movies;
 
@@ -122,7 +134,7 @@ describe("PUT /api/movies/:id", () => {
     expect(movieInDatabase.year).toStrictEqual(updatedMovie.year);
 
     expect(movieInDatabase).toHaveProperty("color");
-    expect(movieInDatabase.color).toStrictEqual(updatedMovie.color);
+    expect(Boolean(parseInt(movieInDatabase.color))).toStrictEqual(updatedMovie.color);
 
     expect(movieInDatabase).toHaveProperty("duration");
     expect(movieInDatabase.duration).toStrictEqual(updatedMovie.duration);
@@ -135,7 +147,7 @@ describe("PUT /api/movies/:id", () => {
       .put(`/api/movies/1`)
       .send(movieWithMissingProps);
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(422);
   });
 
   it("should return no movie", async () => {
@@ -143,7 +155,7 @@ describe("PUT /api/movies/:id", () => {
       title: "Avatar",
       director: "James Cameron",
       year: "2009",
-      color: "1",
+      color: true,
       duration: 162,
     };
 

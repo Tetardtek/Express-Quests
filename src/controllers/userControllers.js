@@ -11,7 +11,7 @@ const getUsers = (req, res) => {
       res.sendStatus(404);
     });
 };
-const getUsersById = (req, res) => {
+const getUserById = (req, res) => {
   const id = parseInt(req.params.id);
 
   database
@@ -69,7 +69,7 @@ const updateUsers = (req, res) => {
 
 module.exports = {
   getUsers,
-  getUsersById,
+  getUserById,
   postUsers,
   updateUsers,
 };

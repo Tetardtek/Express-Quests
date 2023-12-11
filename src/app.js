@@ -7,15 +7,17 @@ app.use(express.json());
 const movieControllers = require("./controllers/movieControllers");
 const userControllers = require("./controllers/userControllers");
 
+const validateUser = require("./middlewares/validateUser");
+const validateMovie = require("./middlewares/validateMovie");
+
+
 app.get("/api/movies", movieControllers.getMovies);
 app.get("/api/movies/:id", movieControllers.getMovieById);
-app.post("/api/movies", movieControllers.postMovies);
-app.put("/api/movies/:id", movieControllers.updateMovies);
-
-
 app.get("/api/users", userControllers.getUsers);
 app.get("/api/users/:id", userControllers.getUsersById);
-app.post("/api/users", userControllers.postUsers);
-app.put("/api/users/:id", userControllers.updateUsers);
+app.post("/api/movies", validateMovie, movieControllers.postMovies);
+app.post("/api/users", validateUser, userControllers.postUsers);
+app.put("/api/movies/:id", validateMovie, movieControllers.updateMovies);
+app.put("/api/users/:id", validateUser, userControllers.updateUsers);
 
 module.exports = app;
