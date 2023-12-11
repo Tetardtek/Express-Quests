@@ -4,10 +4,9 @@ const getMovies = (req, res) => {
   database
     .query("select * from movies")
     .then(([movies]) => {
-      res.json(movies);
+      res.json(movies); // use res.json instead of console.log
     })
     .catch((err) => {
-      console.error(err);
       res.sendStatus(500);
     });
 };
@@ -25,13 +24,11 @@ const getMovieById = (req, res) => {
       }
     })
     .catch((err) => {
-      console.error(err);
       res.sendStatus(500);
     });
 };
 
-
-const postMovies = (req, res) => {
+const postMovie = (req, res) => {
   const { title, director, year, color, duration } = req.body;
 
   database
@@ -43,12 +40,11 @@ const postMovies = (req, res) => {
       res.status(201).send({ id: result.insertId });
     })
     .catch((err) => {
-      console.error(err);
       res.sendStatus(500);
     });
 };
 
-const updateMovies = (req, res) => {
+const putMovie = (req, res) => {
   const id = parseInt(req.params.id);
   const { title, director, year, color, duration } = req.body;
 
@@ -65,7 +61,6 @@ const updateMovies = (req, res) => {
       }
     })
     .catch((err) => {
-      console.error(err);
       res.sendStatus(500);
     });
 };
@@ -74,6 +69,6 @@ const updateMovies = (req, res) => {
 module.exports = {
   getMovies,
   getMovieById,
-  postMovies,
-  updateMovies,
+  postMovie,
+  putMovie,
 };

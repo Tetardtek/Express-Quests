@@ -4,14 +4,14 @@ const getUsers = (req, res) => {
   database
     .query("select * from users")
     .then(([users]) => {
-      res.json(users);
+      res.json(users); // use res.json instead of console.log
     })
     .catch((err) => {
-      console.error(err);
-      res.sendStatus(404);
+      res.sendStatus(500);
     });
 };
-const getUserById = (req, res) => {
+
+const getUsersById = (req, res) => {
   const id = parseInt(req.params.id);
 
   database
@@ -24,11 +24,11 @@ const getUserById = (req, res) => {
       }
     })
     .catch((err) => {
-      console.error(err);
       res.sendStatus(500);
     });
 };
-const postUsers = (req, res) => {
+
+const postUser = (req, res) => {
   const { firstname, lastname, email, city, language } = req.body;
 
   database
@@ -40,18 +40,18 @@ const postUsers = (req, res) => {
       res.status(201).send({ id: result.insertId });
     })
     .catch((err) => {
-      console.error(err);
+      console.log(err)
       res.sendStatus(500);
     });
 };
 
-const updateUsers = (req, res) => {
+const putUser = (req, res) => {
   const id = parseInt(req.params.id);
   const { firstname, lastname, email, city, language } = req.body;
 
   database
     .query(
-      "update users set firstname = ?, lastname = ?, email = ?, city = ?, language = ? where id = ?",
+      "UPDATE users set firstname = ?, lastname = ?, email = ?, city = ?, language = ? where id = ?",
       [firstname, lastname, email, city, language, id]
     )
     .then(([result]) => {
@@ -62,14 +62,13 @@ const updateUsers = (req, res) => {
       }
     })
     .catch((err) => {
-      console.error(err);
       res.sendStatus(500);
     });
 };
 
 module.exports = {
   getUsers,
-  getUserById,
-  postUsers,
-  updateUsers,
+  getUsersById,
+  postUser,
+  putUser,
 };
